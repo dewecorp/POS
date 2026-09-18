@@ -977,3 +977,114 @@ textarea:hover {
     background-color: #ef4444 !important;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
 }
+
+/* =========================================================
+   Custom Select (panel rounded + hidden scroll)
+   ========================================================= */
+.select-ui {
+    position: relative;
+    width: 100%;
+}
+.select-ui > select {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+.select-ui-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    border-radius: 0.9rem;
+    border: 1px solid #f1f5f9;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    padding: 0.55rem 0.9rem;
+    font-size: 0.8rem;
+    color: #0f172a;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+.select-ui-trigger:hover {
+    border-color: #e2e8f0;
+}
+.select-ui-trigger:focus,
+.select-ui.open .select-ui-trigger {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+.select-ui-trigger .ph {
+    color: #94a3b8;
+}
+.select-ui-trigger .arrow {
+    flex-shrink: 0;
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+}
+.select-ui.open .select-ui-trigger .arrow {
+    transform: rotate(180deg);
+}
+.select-ui-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 60;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.22);
+    padding: 0.35rem;
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.select-ui-panel[hidden] {
+    display: none;
+}
+.select-ui-panel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+.select-ui-group {
+    padding: 0.4rem 0.65rem 0.15rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+.select-ui-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 0.65rem;
+    font-size: 0.8rem;
+    color: #334155;
+    cursor: pointer;
+}
+.select-ui-option:hover {
+    background-color: #f1f5f9;
+}
+.select-ui-option.active {
+    background-color: #ecfdf5;
+    color: #065f46;
+    font-weight: 600;
+}
+.select-ui-option .check {
+    flex-shrink: 0;
+    opacity: 0;
+    color: #059669;
+}
+.select-ui-option.active .check {
+    opacity: 1;
+}

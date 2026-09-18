@@ -12,8 +12,12 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   if(!csrf_verify($_POST['_csrf']??'')) { flash_set('error','CSRF tidak valid'); redirect($_SERVER['REQUEST_URI']); }
   $act=$_POST['act']??'';
   if($act==='create'){
-    $code=trim($_POST['code']??''); $name=trim($_POST['name']??''); $desc=trim($_POST['description']??'');
-    if($code===''||$name===''){ flash_set('error','Kode dan nama wajib'); redirect($_SERVER['REQUEST_URI']); }
+    $name=trim($_POST['name']??''); $desc=trim($_POST['description']??'');
+    if($name===''){ flash_set('error','Nama wajib'); redirect($_SERVER['REQUEST_URI']); }
+    $nextId=(int)$pdo->query("SELECT COALESCE(MAX(id),0)+1 FROM product_categories")->fetchColumn();
+    $code=gen_code('CAT', $nextId, 3);
+    $chk=$pdo->prepare("SELECT COUNT(*) FROM product_categories WHERE code=?"); $chk->execute([$code]);
+    while($chk->fetchColumn()>0){ $nextId++; $code=gen_code('CAT', $nextId, 3); $chk->execute([$code]); }
     try{ $pdo->prepare("INSERT INTO product_categories (code,name,description) VALUES (?,?,?)")->execute([$code,$name,$desc]); audit('CREATE_CATEGORY','products',null,"Buat kategori $code"); flash_set('success','Kategori ditambahkan'); }catch(PDOException $e){ flash_set('error','Kode sudah ada'); }
     redirect($_SERVER['REQUEST_URI']);
   } elseif($act==='update'){
@@ -56,5 +60,5 @@ $stmt=$pdo->prepare("SELECT * FROM product_categories $where ORDER BY id DESC LI
 <form method="POST" class="space-y-2"><input type="hidden" name="_csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="act" value="update"><input type="hidden" name="id" value="<?=$r['id']?>"><input name="code" value="<?=e($r['code'])?>" required class="w-full rounded-xl border px-3 py-2 text-xs"><input name="name" value="<?=e($r['name'])?>" required class="w-full rounded-xl border px-3 py-2 text-xs"><textarea name="description" class="w-full rounded-xl border px-3 py-2 text-xs"><?=e($r['description'])?></textarea><select name="is_active" class="w-full rounded-xl border px-3 py-2 text-xs"><option value="1" <?=$r['is_active']?'selected':''?>>Aktif</option><option value="0" <?=!$r['is_active']?'selected':''?>>Nonaktif</option></select><button class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-semibold text-white">Simpan</button></form></div></div></div>
 <?php endforeach;?>
 <div id="modalAdd" class="modal-dashboard hidden"><div class="modal-dialog max-w-sm"><div class="modal-content"><div class="flex justify-between mb-3"><h3 class="text-sm font-semibold">Tambah Kategori</h3><button data-modal-hide="#modalAdd" class="btn-close"></button></div>
-<form method="POST" class="space-y-2"><input type="hidden" name="_csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="act" value="create"><input name="code" required placeholder="Kode (CAT006)" class="w-full rounded-xl border px-3 py-2 text-xs"><input name="name" required placeholder="Nama kategori" class="w-full rounded-xl border px-3 py-2 text-xs"><textarea name="description" placeholder="Deskripsi" class="w-full rounded-xl border px-3 py-2 text-xs"></textarea><button class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-semibold text-white">Simpan</button></form></div></div></div>
+<form method="POST" class="space-y-2"><input type="hidden" name="_csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="act" value="create"><div class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[11px] text-emerald-700 flex items-center gap-2"><svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Kode kategori otomatis digenerate sistem</div><input name="name" required placeholder="Nama kategori" class="w-full rounded-xl border px-3 py-2 text-xs"><textarea name="description" placeholder="Deskripsi" class="w-full rounded-xl border px-3 py-2 text-xs"></textarea><button class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-semibold text-white">Simpan</button></form></div></div></div>
 <?php include __DIR__.'/../../components/footer.php'; ?></body></html>

@@ -481,4 +481,111 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    // Custom dropdown untuk semua <select> (panel rounded + hidden scroll)
+    (function initCustomSelects() {
+        function enhance(select) {
+            if (select.dataset.selectUi) return;
+            select.dataset.selectUi = '1';
+
+            const wrap = document.createElement('div');
+            wrap.className = 'select-ui';
+            Array.from(select.classList).forEach(function (c) {
+                if (c === 'flex-1' || c === 'w-full' || c.indexOf('col-span-') === 0 || c === 'min-w-0') {
+                    wrap.classList.add(c);
+                }
+            });
+            select.parentNode.insertBefore(wrap, select);
+            wrap.appendChild(select);
+
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'select-ui-trigger';
+            trigger.innerHTML = '<span class="label"></span><svg class="arrow h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>';
+            wrap.appendChild(trigger);
+
+            const panel = document.createElement('div');
+            panel.className = 'select-ui-panel';
+            panel.hidden = true;
+            wrap.appendChild(panel);
+
+            const labelEl = trigger.querySelector('.label');
+
+            function currentOption() {
+                return select.options[select.selectedIndex] || select.options[0] || null;
+            }
+
+            function syncTrigger() {
+                const opt = currentOption();
+                const isPlaceholder = !select.value;
+                labelEl.textContent = opt ? opt.text : '';
+                labelEl.className = 'label' + (isPlaceholder ? ' ph' : '');
+            }
+
+            function buildPanel() {
+                panel.innerHTML = '';
+                let lastGroup = null;
+                Array.from(select.children).forEach(function (node) {
+                    if (node.tagName === 'OPTGROUP') {
+                        const g = document.createElement('div');
+                        g.className = 'select-ui-group';
+                        g.textContent = node.label;
+                        panel.appendChild(g);
+                        Array.from(node.children).forEach(function (o) { addOption(o); });
+                    } else if (node.tagName === 'OPTION') {
+                        addOption(node);
+                    }
+                });
+            }
+
+            function addOption(opt) {
+                const item = document.createElement('div');
+                item.className = 'select-ui-option' + (opt.selected ? ' active' : '');
+                item.dataset.value = opt.value;
+                item.innerHTML = '<span>' + opt.text + '</span><svg class="check h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+                item.addEventListener('click', function () {
+                    select.value = opt.value;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncTrigger();
+                    close();
+                });
+                panel.appendChild(item);
+            }
+
+            function open() {
+                document.querySelectorAll('.select-ui.open').forEach(function (o) {
+                    if (o !== wrap) {
+                        o.classList.remove('open');
+                        const p = o.querySelector('.select-ui-panel');
+                        if (p) p.hidden = true;
+                    }
+                });
+                buildPanel();
+                panel.hidden = false;
+                wrap.classList.add('open');
+            }
+
+            function close() {
+                wrap.classList.remove('open');
+                panel.hidden = true;
+            }
+
+            trigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (wrap.classList.contains('open')) close(); else open();
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) close();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') close();
+            });
+
+            syncTrigger();
+        }
+
+        document.querySelectorAll('select').forEach(enhance);
+    })();
 });
