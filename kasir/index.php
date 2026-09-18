@@ -16,9 +16,9 @@ $quick=$pdo->query("SELECT * FROM products WHERE is_active=1 ORDER BY stock DESC
 <body class="min-h-screen bg-slate-50 flex flex-col">
 <?php include __DIR__.'/../components/header.php'; ?>
 <div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2 flex gap-2 text-xs overflow-auto">
-<a href="<?=APP_URL?>/kasir/index.php" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">PENJUALAN (F1)</a>
-<a href="<?=APP_URL?>/kasir/cek-harga.php" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">CEK HARGA (F3)</a>
-<a href="<?=APP_URL?>/kasir/history.php" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">HISTORY (F4)</a>
+<a href="<?=url('/kasir/index')?>" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">PENJUALAN (F1)</a>
+<a href="<?=url('/kasir/cek-harga')?>" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">CEK HARGA (F3)</a>
+<a href="<?=url('/kasir/history')?>" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">HISTORY (F4)</a>
 <button id="btnHelp" class="ml-auto rounded-full border px-3 py-2">Shortcut ?</button>
 </div>
 <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start">
@@ -135,7 +135,7 @@ function removeItem(i){ cart.splice(i,1); renderCart(); }
 
 async function search(q){
  if(!q) return;
- const r=await fetch('<?=APP_URL?>/api/products.php?q='+encodeURIComponent(q));
+ const r=await fetch('<?=url('/api/products')?>?q='+encodeURIComponent(q));
  const j=await r.json();
  const box=document.getElementById('searchResult');
  if(!j.data || j.data.length===0){ box.innerHTML='<div class="p-3 text-xs text-slate-400">Tidak ditemukan</div>'; box.classList.remove('hidden'); return; }
@@ -148,14 +148,14 @@ async function search(q){
 async function addProduct(id){
  let p=null;
  try{
-  const r=await fetch('<?=APP_URL?>/api/products.php?id='+id);
+  const r=await fetch('<?=url('/api/products')?>?id='+id);
   const j=await r.json();
   if(j.success && j.data && j.data.id) p=j.data;
  }catch(e){}
  if(!p || !p.id){
   const br=document.getElementById('searchInput').value.trim();
   if(br){
-   try{ const rb=await fetch('<?=APP_URL?>/api/products.php?barcode='+encodeURIComponent(br)); const jb=await rb.json(); if(jb.success && jb.data) p=jb.data; }catch(e){}
+   try{ const rb=await fetch('<?=url('/api/products')?>?barcode='+encodeURIComponent(br)); const jb=await rb.json(); if(jb.success && jb.data) p=jb.data; }catch(e){}
   }
  }
  if(!p || !p.id){ Swal.fire({icon:'error',title:'Produk tidak ditemukan'}); return; }
@@ -176,7 +176,7 @@ document.getElementById('searchInput').addEventListener('input',e=>{
   return;
  }
  searchTimer=setTimeout(()=>{
-  fetch('<?=APP_URL?>/api/products.php?barcode='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{
+  fetch('<?=url('/api/products')?>?barcode='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{
    if(j.success && j.data && j.data.id){
     addProduct(j.data.id);
    } else {
@@ -192,7 +192,7 @@ document.getElementById('searchInput').addEventListener('keydown',e=>{
   clearTimeout(searchTimer);
   let v=e.target.value.trim();
   if(!v) return;
-  fetch('<?=APP_URL?>/api/products.php?barcode='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{
+  fetch('<?=url('/api/products')?>?barcode='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{
    if(j.success && j.data && j.data.id){
     addProduct(j.data.id);
    } else {
@@ -229,12 +229,12 @@ async function doBayar(){
   paid_amount: parseNum(document.getElementById('paidAmount').value)||c.grand,
   payment_method: document.getElementById('payMethod').value
  };
- const res=await fetch('<?=APP_URL?>/api/sales.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},body:JSON.stringify(payload)});
+ const res=await fetch('<?=url('/api/sales')?>',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},body:JSON.stringify(payload)});
  const j=await res.json();
  if(!j.success) return Swal.fire({icon:'error',title:'Gagal',text:j.message});
  document.getElementById('strukNo').textContent=j.data.transaction_number+' • '+rupiah(j.data.grand_total);
  document.getElementById('strukPreview').textContent='Transaksi: '+j.data.transaction_number+'\nTotal: '+rupiah(j.data.grand_total)+'\nKembalian: '+rupiah(j.data.change)+'\n\nTerima kasih!';
- document.getElementById('btnCetak').href='<?=APP_URL?>/kasir/cetak-struk.php?id='+j.data.sale_id;
+ document.getElementById('btnCetak').href='<?=url('/kasir/cetak-struk')?>?id='+j.data.sale_id;
  document.getElementById('modalStruk').classList.remove('hidden');
  cart=[]; renderCart();
 }
@@ -243,19 +243,19 @@ document.getElementById('btnBayar').addEventListener('click',doBayar);
 document.getElementById('btnParkir').addEventListener('click',async()=>{
  if(cart.length===0) return Swal.fire({icon:'warning',title:'Keranjang kosong'});
  const payload={items:cart,customer_id:document.getElementById('customerSelect').value,discount_type:document.getElementById('discType').value,discount_value:document.getElementById('discValue').value,additional_cost:document.getElementById('addCost').value,paid:parseNum(document.getElementById('paidAmount').value),payMethod:document.getElementById('payMethod').value};
- const r=await fetch('<?=APP_URL?>/api/held.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},body:JSON.stringify(payload)});
+ const r=await fetch('<?=url('/api/held')?>',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},body:JSON.stringify(payload)});
  const j=await r.json();
  if(j.success){ Swal.fire({icon:'success',title:j.message,text:j.data.code}); cart=[]; renderCart(); } else Swal.fire({icon:'error',title:j.message});
 });
 document.getElementById('btnLihatParkir').addEventListener('click',async()=>{
- const r=await fetch('<?=APP_URL?>/api/held.php'); const j=await r.json();
+ const r=await fetch('<?=url('/api/held')?>'); const j=await r.json();
  let h='';
  (j.data||[]).forEach(p=>{ h+=`<div class="flex justify-between rounded-xl border px-3 py-2"><span>${p.code} — ${p.created_at}</span><div class="flex gap-1"><button onclick="loadParkir(${p.id})" class="rounded-full bg-emerald-600 px-3 py-1 text-white">Buka</button><button onclick="hapusParkir(${p.id})" class="rounded-full border px-3 py-1 text-rose-600">Hapus</button></div></div>`; });
  document.getElementById('parkirList').innerHTML=h||'<p class="text-slate-400">Tidak ada parkir</p>';
  document.getElementById('modalParkir').classList.remove('hidden');
 });
 async function loadParkir(id){
- const r=await fetch('<?=APP_URL?>/api/held.php?id='+id); const j=await r.json();
+ const r=await fetch('<?=url('/api/held')?>?id='+id); const j=await r.json();
  if(!j.success) return Swal.fire({icon:'error',title:j.message});
  const d=j.data;
  cart=d.items||[]; if(d.customer_id) document.getElementById('customerSelect').value=d.customer_id;
@@ -282,7 +282,7 @@ async function hapusParkir(id){
   }
  });
  if(!conf.isConfirmed) return;
- const r=await fetch('<?=APP_URL?>/api/held.php?id='+id,{method:'DELETE',headers:{'X-CSRF-TOKEN':CSRF}});
+ const r=await fetch('<?=url('/api/held')?>?id='+id,{method:'DELETE',headers:{'X-CSRF-TOKEN':CSRF}});
  const j=await r.json();
  Swal.fire({icon:'success',title:j.message,timer:1500,showConfirmButton:false});
  document.getElementById('btnLihatParkir').click();

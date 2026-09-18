@@ -60,7 +60,7 @@ $pageSize=$size==='80'?'80mm':'58mm';
 <p class="text-center text-[10px] text-slate-400">Status: <?=strtoupper(e($sale['status']))?></p>
 <div class="no-print mt-4 flex gap-2">
   <button onclick="window.print()" class="flex-1 rounded-xl bg-emerald-600 py-2 font-semibold text-white text-xs hover:bg-emerald-700 transition">Cetak</button>
-  <a href="<?=APP_URL?>/kasir/history.php" class="flex-1 rounded-xl border border-slate-300 py-2 text-center text-xs font-semibold hover:bg-slate-100 transition">Kembali</a>
+  <a href="<?=url('/kasir/history')?>" class="flex-1 rounded-xl border border-slate-300 py-2 text-center text-xs font-semibold hover:bg-slate-100 transition">Kembali</a>
 </div>
 </div>
 <?php if($print):?><script>window.print()</script><?php endif;?>

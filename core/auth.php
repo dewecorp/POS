@@ -5,7 +5,7 @@ require_once __DIR__ . '/helper.php';
 function current_user(){ return $_SESSION['user'] ?? null; }
 function is_logged_in(): bool { return !empty($_SESSION['user_id']); }
 function require_login(){
-    if(!is_logged_in()){ header('Location: '.APP_URL.'/login.php'); exit; }
+    if(!is_logged_in()){ header('Location: '.url('/login')); exit; }
 }
 function require_role($roles){
     require_login();

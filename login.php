@@ -9,7 +9,7 @@ require_once __DIR__.'/core/auth.php';
 require_once __DIR__.'/core/audit.php';
 if(is_logged_in()){
   $r=$_SESSION['user']['role']??'kasir';
-  redirect($r==='admin' ? APP_URL.'/admin/index.php' : APP_URL.'/kasir/index.php');
+  redirect($r==='admin' ? url('/admin') : url('/kasir'));
 }
 $err=flash_get('error');
 $flashSuccess=flash_get('success');
@@ -34,7 +34,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         login_user(['id'=>$u['id'],'name'=>$u['name'],'username'=>$u['username'],'email'=>$u['email'],'role'=>$u['role'],'permissions'=>$perms]);
         $pdo->prepare("UPDATE users SET last_login=NOW() WHERE id=?")->execute([$u['id']]);
         audit('LOGIN','auth',$u['id'],'Login berhasil');
-        redirect(($u['role']==='admin'||$u['role']==='manager'||$u['role']==='owner')? APP_URL.'/admin/index.php' : APP_URL.'/kasir/index.php');
+        redirect(($u['role']==='admin'||$u['role']==='manager'||$u['role']==='owner')? url('/admin') : url('/kasir'));
       }
     }
   }

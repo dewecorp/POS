@@ -16,7 +16,7 @@ if($q!==''){
 ?>
 <!DOCTYPE html><html lang="id"><head><title>Cek Harga • <?=e(APP_NAME)?></title><?php include __DIR__.'/../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../components/header.php';?>
-<div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2 flex gap-2 text-xs"><a href="<?=APP_URL?>/kasir/index.php" class="rounded-full border bg-white px-4 py-2">PENJUALAN</a><a href="<?=APP_URL?>/kasir/cek-harga.php" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">CEK HARGA</a><a href="<?=APP_URL?>/kasir/history.php" class="rounded-full border bg-white px-4 py-2">HISTORY</a></div>
+<div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2 flex gap-2 text-xs"><a href="<?=url('/kasir/index')?>" class="rounded-full border bg-white px-4 py-2">PENJUALAN</a><a href="<?=url('/kasir/cek-harga')?>" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">CEK HARGA</a><a href="<?=url('/kasir/history')?>" class="rounded-full border bg-white px-4 py-2">HISTORY</a></div>
 <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../components/sidebar_kasir.php';?>
 <section class="order-2 flex-1 space-y-4">
 <h2 class="text-lg font-semibold">Cek Harga</h2>

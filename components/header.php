@@ -45,7 +45,7 @@ $hariIni = $hariList[date('l')].', '.date('j').' '.$bulanList[date('F')].' '.dat
         <p class="truncate text-[10px] uppercase tracking-wider text-slate-400"><?=e($role)?></p>
       </div>
     </div>
-    <a href="<?=APP_URL?>/logout.php" class="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600">
+    <a href="<?=url('/logout')?>" class="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600">
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
       Logout
     </a>
@@ -60,6 +60,6 @@ $hariIni = $hariList[date('l')].', '.date('j').' '.$bulanList[date('F')].' '.dat
   <div class="flex items-center justify-between text-xs text-white mb-2">
     <span><?=e($u['name']??'')?> (<?=e($role)?>)</span>
   </div>
-  <a href="<?=APP_URL?>/logout.php" class="block w-full rounded-lg bg-rose-600 px-3 py-2 text-center text-xs font-medium text-white shadow">Logout</a>
+  <a href="<?=url('/logout')?>" class="block w-full rounded-lg bg-rose-600 px-3 py-2 text-center text-xs font-medium text-white shadow">Logout</a>
 </div>
 </header>

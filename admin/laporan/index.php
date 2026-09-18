@@ -183,14 +183,14 @@ if($printView): ?>
 <section class="order-2 flex-1 space-y-4">
 <nav class="text-[11px] text-slate-500">Dashboard / Laporan</nav>
 <h2 class="text-lg font-semibold">Laporan Penjualan & Laba</h2>
-<form method="GET" class="rounded-2xl border bg-white p-3 flex flex-wrap items-center gap-2 text-xs">
-<input type="date" name="from" value="<?=e($from)?>" class="rounded-xl border px-2 py-2">
-<input type="date" name="to" value="<?=e($to)?>" class="rounded-xl border px-2 py-2">
-<select name="kasir" class="rounded-xl border px-2 py-2"><option value="">Semua kasir</option><?php foreach($users as $u):?><option value="<?=$u['id']?>" <?=$kasir==$u['id']?'selected':''?>><?=e($u['name'])?></option><?php endforeach;?></select>
-<select name="cat" class="rounded-xl border px-2 py-2"><option value="">Semua kategori</option><?php foreach($cats as $c):?><option value="<?=$c['id']?>" <?=$cat==$c['id']?'selected':''?>><?=e($c['name'])?></option><?php endforeach;?></select>
-<select name="pay" class="rounded-xl border px-2 py-2"><option value="">Semua bayar</option><option value="tunai" <?=$pay=='tunai'?'selected':''?>>Tunai</option><option value="transfer" <?=$pay=='transfer'?'selected':''?>>Transfer</option><option value="qris" <?=$pay=='qris'?'selected':''?>>QRIS</option></select>
-<button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 transition">Filter</button>
-<button type="submit" name="export" value="1" class="rounded-xl border border-slate-300 bg-white px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 transition inline-flex items-center gap-1.5">
+<form method="GET" class="rounded-2xl border bg-white p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+<input type="date" name="from" value="<?=e($from)?>" class="rounded-xl border px-3 py-2">
+<input type="date" name="to" value="<?=e($to)?>" class="rounded-xl border px-3 py-2">
+<select name="kasir" class="rounded-xl border px-3 py-2"><option value="">Semua kasir</option><?php foreach($users as $u):?><option value="<?=$u['id']?>" <?=$kasir==$u['id']?'selected':''?>><?=e($u['name'])?></option><?php endforeach;?></select>
+<select name="cat" class="rounded-xl border px-3 py-2"><option value="">Semua kategori</option><?php foreach($cats as $c):?><option value="<?=$c['id']?>" <?=$cat==$c['id']?'selected':''?>><?=e($c['name'])?></option><?php endforeach;?></select>
+<select name="pay" class="rounded-xl border px-3 py-2"><option value="">Semua bayar</option><option value="tunai" <?=$pay=='tunai'?'selected':''?>>Tunai</option><option value="transfer" <?=$pay=='transfer'?'selected':''?>>Transfer</option><option value="qris" <?=$pay=='qris'?'selected':''?>>QRIS</option></select>
+<button type="submit" class="justify-self-start rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 transition">Filter</button>
+<button type="submit" name="export" value="1" class="rounded-xl border border-slate-300 bg-white px-3 py-2 font-medium text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-1.5">
   <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
   Export Excel
 </button>

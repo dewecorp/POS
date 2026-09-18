@@ -885,10 +885,7 @@ textarea:hover {
     width: 90% !important;
 }
 .swal2-icon {
-    width: 3.5rem !important;
-    height: 3.5rem !important;
     margin: 0 auto 0.75rem !important;
-    border-width: 3px !important;
 }
 .swal2-icon.swal2-success {
     border-color: #10b981 !important;
@@ -983,7 +980,9 @@ textarea:hover {
    ========================================================= */
 .select-ui {
     position: relative;
-    width: 100%;
+    display: block;
+    width: auto;
+    min-width: 0;
 }
 .select-ui > select {
     position: absolute;
@@ -998,12 +997,14 @@ textarea:hover {
     justify-content: space-between;
     gap: 0.5rem;
     width: 100%;
+    min-width: 9rem;
     border-radius: 0.9rem;
     border: 1px solid #f1f5f9;
     background-color: #ffffff;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-    padding: 0.55rem 0.9rem;
+    padding: 0.5rem 0.9rem;
     font-size: 0.8rem;
+    line-height: 1.25rem;
     color: #0f172a;
     text-align: left;
     cursor: pointer;

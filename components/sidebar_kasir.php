@@ -1,12 +1,12 @@
 <?php
 $uri=$_SERVER['REQUEST_URI']??'';
 function kas_item($p,$uri,$label,$icon){
-    $active = strpos($uri,$p)!==false;
+    $active = nav_active($p,$uri);
     $cls = $active
         ? 'flex items-center gap-2 rounded-lg bg-white/20 px-3 py-2 text-xs font-semibold text-white shadow-sm ring-1 ring-white/20'
         : 'flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-emerald-100 hover:bg-white/10 hover:text-white transition';
     $ic = $active ? 'text-white' : 'text-emerald-200';
-    echo '<li><a href="'.APP_URL.$p.'" class="'.$cls.'"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 '.$ic.'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">'.$icon.'</svg><span>'.$label.'</span></a></li>';
+    echo '<li><a href="'.url($p).'" class="'.$cls.'"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 '.$ic.'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">'.$icon.'</svg><span>'.$label.'</span></a></li>';
 }
 ?>
 <aside id="sidebar" class="order-1 w-full hidden lg:flex lg:w-64 lg:shrink-0 lg:sticky lg:top-14 lg:h-auto lg:flex-col lg:self-start">

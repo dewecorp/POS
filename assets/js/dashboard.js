@@ -486,6 +486,7 @@ document.addEventListener("DOMContentLoaded", function () {
     (function initCustomSelects() {
         function enhance(select) {
             if (select.dataset.selectUi) return;
+            if (select.closest('.swal2-container') || select.id === 'swal2-select') return;
             select.dataset.selectUi = '1';
 
             const wrap = document.createElement('div');

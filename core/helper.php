@@ -1,6 +1,31 @@
 <?php
 require_once __DIR__ . '/../config/app.php';
 function e($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function url($path){
+    $path = '/'.ltrim((string)$path, '/');
+    if(defined('PRETTY_URL') && PRETTY_URL){
+        $path = preg_replace('#/index(?:\.php)?$#', '', $path);
+        $path = preg_replace('#\.php$#', '', $path);
+        if($path === '') $path = '/';
+        return APP_URL.$path;
+    }
+    // Fallback tanpa rewrite: resolve ke file .php yang benar-benar ada
+    $root = dirname(__DIR__);
+    if(substr($path,-4)==='.php' && is_file($root.$path)) return APP_URL.$path;
+    if(is_file($root.$path.'.php')) return APP_URL.$path.'.php';
+    if(is_file($root.rtrim($path,'/').'/index.php')) return APP_URL.rtrim($path,'/').'/index.php';
+    return APP_URL.$path;
+}
+function nav_active($p,$uri){
+    $base = rtrim((string)parse_url(APP_URL, PHP_URL_PATH), '/');
+    $req  = (string)parse_url($uri, PHP_URL_PATH);
+    if($base !== '' && strpos($req, $base) === 0){ $req = substr($req, strlen($base)); }
+    $req   = rtrim(preg_replace('#(?:/index)?\.php$#', '', $req), '/');
+    $match = rtrim(preg_replace('#(?:/index)?\.php$#', '', $p), '/');
+    if($req === '') $req = '/';
+    if($match === '') $match = '/';
+    return $req === $match;
+}
 function rupiah($n){ return 'Rp ' . number_format((int)$n,0,',','.'); }
 function rupiah_input($n){ return number_format((int)$n,0,',','.'); }
 function parse_rupiah($s){ return (int)preg_replace('/[^0-9]/','',(string)$s); }

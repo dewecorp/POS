@@ -15,6 +15,8 @@ if($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['act']??'')==='koreksi_barang'
   $item_ids=$_POST['item_id']??[];
   $qtys=$_POST['qty']??[];
   $deletes=$_POST['delete_item']??[]; // array of item_id yang mau dihapus
+  $newProductIds=$_POST['new_product_id']??[];
+  $newQtys=$_POST['new_qty']??[];
 
   if($sale_id<=0 || empty($reason)){
     flash_set('error','Alasan koreksi wajib diisi'); redirect($_SERVER['REQUEST_URI']);
@@ -87,11 +89,41 @@ if($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['act']??'')==='koreksi_barang'
       }
     }
 
+    // Tambah barang baru ke transaksi
+    foreach($newProductIds as $idx=>$pid){
+      $pid=(int)$pid;
+      $addQty=(int)($newQtys[$idx]??0);
+      if($pid<=0 || $addQty<=0) continue;
+
+      $pStmt=$pdo->prepare("SELECT * FROM products WHERE id=? FOR UPDATE");
+      $pStmt->execute([$pid]);
+      $prod=$pStmt->fetch();
+      if(!$prod || !$prod['is_active']) throw new Exception("Produk tidak ditemukan / nonaktif");
+
+      $curStock=(int)$prod['stock'];
+      if(!ALLOW_NEGATIVE_STOCK && $curStock < $addQty){
+        throw new Exception("Stok {$prod['name']} tidak cukup (sisa $curStock)");
+      }
+      $newStock=$curStock - $addQty;
+      $pdo->prepare("UPDATE products SET stock=? WHERE id=?")->execute([$newStock,$pid]);
+      $pdo->prepare("INSERT INTO stock_movements (product_id,type,reference_type,reference_id,qty_change,stock_before,stock_after,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?)")
+          ->execute([$pid,'CORRECTION','sale',$sale_id,-$addQty,$curStock,$newStock,"Tambah item di {$sale['transaction_number']}: $reason",current_user()['id']]);
+
+      $price=(int)$prod['selling_price'];
+      $lineSub=$price * $addQty;
+      $pdo->prepare("INSERT INTO sale_items (sale_id,product_id,product_name,sku,barcode,qty,price,discount_type,discount_value,discount_amount,subtotal) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
+          ->execute([$sale_id,$pid,$prod['name'],$prod['sku'],$prod['barcode'],$addQty,$price,'none',0,0,$lineSub]);
+
+      $newSubtotal += $lineSub;
+      $remainingItems++;
+    }
+
     if($remainingItems===0){
       throw new Exception("Semua item dihapus. Gunakan fitur Void jika transaksi dibatalkan.");
     }
 
-    // Hitung ulang grand total
+    // Hitung ulang grand total dari seluruh item tersisa di DB
+    $newSubtotal=(int)$pdo->query("SELECT COALESCE(SUM(subtotal),0) FROM sale_items WHERE sale_id=$sale_id")->fetchColumn();
     $trxDisc=0;
     if($sale['discount_type']==='percent'){
       $trxDisc=(int)round($newSubtotal * (float)$sale['discount_value'] / 100);
@@ -131,6 +163,7 @@ $total=$pdo->prepare("SELECT COUNT(*) FROM sales s LEFT JOIN users u ON u.id=s.c
 list($pages,$page,$off)=paginate_params($total,$page,$per);
 $stmt=$pdo->prepare("SELECT s.*, u.name as cashier, c.name as customer FROM sales s JOIN users u ON u.id=s.cashier_id LEFT JOIN customers c ON c.id=s.customer_id $where ORDER BY s.id DESC LIMIT $per OFFSET $off"); $stmt->execute($par); $rows=$stmt->fetchAll();
 $methods=$pdo->query("SELECT code FROM payment_methods")->fetchAll(PDO::FETCH_COLUMN);
+$allProducts=$pdo->query("SELECT id,sku,name,selling_price,stock FROM products WHERE is_active=1 ORDER BY name")->fetchAll();
 
 // Preload items untuk modal edit barang tiap transaksi
 $saleIds=array_column($rows,'id');
@@ -143,17 +176,17 @@ if(!empty($saleIds)){
 ?>
 <!DOCTYPE html><html lang="id"><head><title>History • <?=e(APP_NAME)?></title><?php include __DIR__.'/../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../components/header.php';?>
-<div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2 flex gap-2 text-xs"><a href="<?=APP_URL?>/kasir/index.php" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">PENJUALAN</a><a href="<?=APP_URL?>/kasir/cek-harga.php" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">CEK HARGA</a><a href="<?=APP_URL?>/kasir/history.php" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">HISTORY</a></div>
+<div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2 flex gap-2 text-xs"><a href="<?=url('/kasir/index')?>" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">PENJUALAN</a><a href="<?=url('/kasir/cek-harga')?>" class="rounded-full border bg-white px-4 py-2 hover:bg-slate-50">CEK HARGA</a><a href="<?=url('/kasir/history')?>" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">HISTORY</a></div>
 <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../components/sidebar_kasir.php';?>
 <section class="order-2 flex-1 space-y-4">
 <h2 class="text-lg font-semibold">History Penjualan</h2>
-<form method="GET" class="rounded-2xl border bg-white p-3 flex flex-wrap gap-2 text-xs">
-<input name="q" value="<?=e($q)?>" placeholder="No transaksi / kasir / pelanggan" class="flex-1 min-w-[160px] rounded-xl border px-3 py-2">
+<form method="GET" class="rounded-2xl border bg-white p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+<input name="q" value="<?=e($q)?>" placeholder="No transaksi / kasir / pelanggan" class="rounded-xl border px-3 py-2 sm:col-span-2 lg:col-span-1">
 <input type="date" name="from" value="<?=e($from)?>" class="rounded-xl border px-2 py-2">
 <input type="date" name="to" value="<?=e($to)?>" class="rounded-xl border px-2 py-2">
 <select name="status" class="rounded-xl border px-2 py-2"><option value="">Semua status</option><option value="completed" <?=$status==='completed'?'selected':''?>>Completed</option><option value="cancelled" <?=$status==='cancelled'?'selected':''?>>Cancelled</option><option value="corrected" <?=$status==='corrected'?'selected':''?>>Corrected</option></select>
 <select name="pay" class="rounded-xl border px-2 py-2"><option value="">Semua bayar</option><?php foreach($methods as $m):?><option value="<?=$m?>" <?=$pay===$m?'selected':''?>><?=e($m)?></option><?php endforeach;?></select>
-<button class="rounded-xl bg-emerald-600 px-4 py-2 text-white">Filter</button>
+<button class="justify-self-start rounded-xl bg-emerald-600 px-4 py-2 text-white font-medium">Filter</button>
 </form>
 <div class="rounded-2xl border bg-white p-4 shadow-sm"><div class="overflow-auto rounded-xl border"><table class="min-w-full divide-y text-xs"><thead class="bg-slate-100"><tr><th class="px-3 py-2 text-left">No</th><th class="px-3 py-2 text-left">Tanggal</th><th class="px-3 py-2 text-left">Kasir</th><th class="px-3 py-2 text-left">Pelanggan</th><th class="px-3 py-2 text-right">Total</th><th class="px-3 py-2 text-center">Bayar</th><th class="px-3 py-2 text-center">Status</th><th class="px-3 py-2 text-center">Aksi</th></tr></thead><tbody class="divide-y">
 <?php foreach($rows as $r):?>
@@ -167,7 +200,7 @@ if(!empty($saleIds)){
 <td class="px-3 py-2 text-center"><span class="rounded-full px-2 py-0.5 text-[10px] <?=$r['status']=='completed'?'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200':($r['status']=='cancelled'?'bg-rose-50 text-rose-600':($r['status']=='corrected'?'bg-sky-50 text-sky-600 ring-1 ring-sky-200':'bg-amber-50 text-amber-600'))?>"><?=e($r['status'])?></span></td>
 <td class="px-3 py-2 text-center flex justify-center gap-1">
 <button type="button" data-modal-toggle="#detailSale<?=$r['id']?>" title="Detail Penjualan" class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
-<a href="<?=APP_URL?>/kasir/cetak-struk.php?id=<?=$r['id']?>&print=1" target="_blank" title="Cetak Struk" class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg></a>
+<a href="<?=url('/kasir/cetak-struk')?>?id=<?=$r['id']?>&print=1" target="_blank" title="Cetak Struk" class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg></a>
 <?php if(in_array($r['status'],['completed','corrected'],true)):?>
 <button type="button" data-modal-toggle="#editItems<?=$r['id']?>" title="Koreksi Barang" class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
 <?php endif;?>
@@ -226,7 +259,7 @@ if(!empty($saleIds)){
   </div>
 </div>
 <div class="flex gap-2 pt-2 border-t">
-  <a href="<?=APP_URL?>/kasir/cetak-struk.php?id=<?=$r['id']?>" target="_blank" class="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-xs font-semibold text-white hover:bg-emerald-700 transition">Cetak Struk</a>
+  <a href="<?=url('/kasir/cetak-struk')?>?id=<?=$r['id']?>" target="_blank" class="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-xs font-semibold text-white hover:bg-emerald-700 transition">Cetak Struk</a>
   <button type="button" data-modal-hide="#detailSale<?=$r['id']?>" class="rounded-xl border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 transition">Tutup</button>
 </div>
 </div></div></div>
@@ -249,9 +282,28 @@ if(!empty($saleIds)){
 </div>
 <?php endforeach;?>
 </div>
+<div class="rounded-xl border border-emerald-200 bg-emerald-50/50 p-2">
+<div class="flex items-center justify-between mb-2"><p class="text-[11px] font-semibold text-emerald-700">Tambah Barang</p><button type="button" onclick="addNewItem<?=$r['id']?>()" class="rounded-full border border-emerald-300 bg-white px-3 py-1 text-[11px] text-emerald-700 hover:bg-emerald-50">+ Baris</button></div>
+<div id="newItems<?=$r['id']?>" class="space-y-2"></div>
+</div>
 <div><label class="block text-[11px] font-medium text-slate-600 mb-1">Alasan Koreksi <span class="text-rose-500">*</span></label><textarea name="reason" required placeholder="Contoh: Salah input produk / kelebihan 1 pcs" class="w-full rounded-xl border px-3 py-2 text-xs" rows="2"></textarea></div>
 <div class="flex gap-2"><button type="submit" class="flex-1 rounded-xl bg-emerald-600 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700">Simpan Koreksi</button><button type="button" data-modal-hide="#editItems<?=$r['id']?>" class="rounded-xl border px-4 py-2 text-xs text-slate-600 hover:bg-slate-100">Batal</button></div>
 </form></div></div></div>
 <?php endif;?>
 <?php endforeach;?>
+<script>
+const HIST_PRODUCTS=<?=json_encode($allProducts, JSON_UNESCAPED_UNICODE)?>;
+function histProductOptions(){
+  return HIST_PRODUCTS.map(p=>'<option value="'+p.id+'">'+p.sku+' — '+p.name+' (Rp '+Number(p.selling_price).toLocaleString('id-ID')+' • stok '+p.stock+')</option>').join('');
+}
+<?php foreach($rows as $r): if(!in_array($r['status'],['completed','corrected'],true)) continue;?>
+function addNewItem<?=$r['id']?>(){
+  const wrap=document.getElementById('newItems<?=$r['id']?>');
+  const d=document.createElement('div');
+  d.className='flex items-center gap-2 rounded-lg bg-white p-2 border border-emerald-200 text-xs';
+  d.innerHTML='<select name="new_product_id[]" class="flex-1 min-w-0 rounded-lg border px-2 py-1 text-xs">'+histProductOptions()+'</select><div class="flex items-center gap-1"><span class="text-[10px] text-slate-400">Qty:</span><input type="number" name="new_qty[]" value="1" min="1" class="w-14 rounded-lg border px-2 py-1 text-center text-xs"></div><button type="button" class="text-rose-500 px-1" onclick="this.parentElement.remove()">×</button>';
+  wrap.appendChild(d);
+}
+<?php endforeach;?>
+</script>
 <?php include __DIR__.'/../components/footer.php';?></body></html>

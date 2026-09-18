@@ -1,5 +1,17 @@
 <?php
 date_default_timezone_set('Asia/Jakarta');
+
+// Deteksi dukungan URL rewriting (clean URL). Fallback ke .php bila tidak tersedia.
+$__pretty = false;
+if (function_exists('apache_get_modules')) {
+    $__pretty = in_array('mod_rewrite', apache_get_modules(), true);
+}
+if (getenv('PRETTY_URL') !== false) {
+    $__pretty = (bool)getenv('PRETTY_URL');
+}
+define('PRETTY_URL', $__pretty);
+unset($__pretty);
+
 define('APP_NAME','POS Profesional');
 define('APP_DEBUG', false);
 define('APP_URL','http://localhost/POS');

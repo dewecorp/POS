@@ -64,7 +64,7 @@ $rets=$pdo->query("SELECT r.*, s.transaction_number, u.name as user FROM returns
 <script>
 document.getElementById('saleSelect').addEventListener('change',async e=>{
  const id=e.target.value; if(!id) return;
- const r=await fetch('<?=APP_URL?>/api/sale_items.php?sale_id='+id); const j=await r.json();
+ const r=await fetch('<?=url('/api/sale_items')?>?sale_id='+id); const j=await r.json();
  let h='';
  (j.data||[]).forEach(it=>{
   h+=`<label class="flex gap-2 items-center rounded-xl border px-3 py-2 bg-slate-50"><input type="checkbox" name="item_id[]" value="${it.id}" checked class="rounded"> <span class="flex-1 text-xs">${it.product_name} — qty ${it.qty} @ ${it.price}</span><input type="number" name="qty[]" value="${it.qty}" min="1" max="${it.qty}" class="w-16 rounded border px-2 py-1 text-xs"></label>`;

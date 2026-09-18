@@ -11,7 +11,7 @@ if(isset($_SESSION['user_id'])){
     $t = $_SESSION['last_activity'] ?? time();
     if(time()-$t > SESSION_TIMEOUT){
         session_unset(); session_destroy(); session_start();
-        header('Location: '.APP_URL.'/login.php?timeout=1'); exit;
+        header('Location: '.url('/login').'?timeout=1'); exit;
     }
     $_SESSION['last_activity']=time();
 }

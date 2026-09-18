@@ -1,6 +1,6 @@
 <footer class="pos-footer border-t border-slate-200 bg-white/80 px-4 py-4 sm:px-6 lg:px-8">
 <div class="flex w-full flex-col items-center justify-between gap-2 text-[11px] text-slate-500 sm:flex-row">
-<p>&copy; <?=date('Y')?> <?=e(APP_NAME)?>. POS Profesional.</p><div class="flex gap-3"><a href="<?=APP_URL?>/admin/index.php" class="hover:text-emerald-600">Dashboard</a><a href="<?=APP_URL?>/kasir/index.php" class="hover:text-emerald-600">Kasir</a></div>
+<p>&copy; <?=date('Y')?> <?=e(APP_NAME)?>. POS Profesional.</p><div class="flex gap-3"><a href="<?=url('/admin/index')?>" class="hover:text-emerald-600">Dashboard</a><a href="<?=url('/kasir/index')?>" class="hover:text-emerald-600">Kasir</a></div>
 </div>
 </footer>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
