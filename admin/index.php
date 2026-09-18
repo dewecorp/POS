@@ -51,6 +51,23 @@ $actColors=[
 ];
 $hariList=['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
 $bulanList=['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'=>'April','May'=>'Mei','June'=>'Juni','July'=>'Juli','August'=>'Agustus','September'=>'September','October'=>'Oktober','November'=>'November','December'=>'Desember'];
+function act_title($action){
+    $map=[
+        'CREATE_SALE'=>'Penjualan Baru','CANCEL_SALE'=>'Void Penjualan','EDIT_SALE'=>'Koreksi Penjualan','CORRECT_SALE_ITEMS'=>'Koreksi Item Penjualan',
+        'LOGIN'=>'Login','LOGOUT'=>'Logout','LOGIN_FAILED'=>'Login Gagal',
+        'CREATE_PRODUCT'=>'Tambah Produk','UPDATE_PRODUCT'=>'Ubah Produk','DELETE_PRODUCT'=>'Hapus Produk',
+        'CREATE_CATEGORY'=>'Tambah Kategori','UPDATE_CATEGORY'=>'Ubah Kategori','DELETE_CATEGORY'=>'Hapus Kategori',
+        'CREATE_SUPPLIER'=>'Tambah Supplier','UPDATE_SUPPLIER'=>'Ubah Supplier','DELETE_SUPPLIER'=>'Hapus Supplier',
+        'CREATE_CUSTOMER'=>'Tambah Pelanggan','UPDATE_CUSTOMER'=>'Ubah Pelanggan','DELETE_CUSTOMER'=>'Hapus Pelanggan',
+        'CREATE_USER'=>'Tambah Pengguna','UPDATE_USER'=>'Ubah Pengguna','DELETE_USER'=>'Hapus Pengguna',
+        'CREATE_PURCHASE'=>'Pembelian Baru','RETURN_SALE'=>'Retur Penjualan',
+        'UPDATE_STOCK'=>'Penyesuaian Stok','STOCK_OPNAME'=>'Stock Opname',
+        'CREATE_EXPENSE'=>'Pengeluaran Baru','OPEN_SHIFT'=>'Buka Shift','CLOSE_SHIFT'=>'Tutup Shift',
+        'UPDATE_SETTINGS'=>'Ubah Pengaturan','CASH_IN'=>'Kas Masuk','CASH_OUT'=>'Kas Keluar',
+    ];
+    if(isset($map[$action])) return $map[$action];
+    return ucwords(strtolower(str_replace('_',' ',$action)));
+}
 ?>
 <!DOCTYPE html><html lang="id"><head><title>Dashboard • <?=e(APP_NAME)?></title><?php include __DIR__.'/../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
@@ -98,8 +115,8 @@ $bulanList=['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-2">
 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 <?=$c['time']?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><?=$m[1]?></svg>
-<span class="text-[11px] font-semibold text-slate-800"><?=e($a['action'])?></span>
-<span class="rounded-full bg-white px-2 py-0.5 text-[9px] font-medium uppercase tracking-wide text-slate-500 ring-1 ring-slate-200"><?=e($a['module'])?></span>
+<span class="text-[11px] font-semibold text-slate-800"><?=e(act_title($a['action']))?></span>
+<span class="rounded-full bg-white px-2 py-0.5 text-[9px] font-medium tracking-wide text-slate-500 ring-1 ring-slate-200"><?=e(ucwords(str_replace('_',' ',$a['module'])))?></span>
 </div>
 <span class="text-[10px] <?=$c['time']?>"><?=time_ago($a['created_at'])?></span>
 </div>
