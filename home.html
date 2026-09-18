@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+    <!-- Navbar sticky -->
+    <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+        <div class="flex w-full items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 shadow-lg shadow-indigo-500/40">
+                    <span class="text-lg font-semibold tracking-tight text-white">DA</span>
+                </div>
+                <div>
+                    <h1 class="text-sm font-medium tracking-tight text-slate-800 sm:text-base">Dashboard Admin</h1>
+                    <p class="text-[11px] text-slate-500 sm:text-xs">Insight cepat untuk aktivitas aplikasi kamu</p>
+                </div>
+            </div>
+
+            <div class="hidden items-center gap-3 md:flex">
+                <button class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Live data
+                </button>
+
+                <button class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-medium text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-700">
+                    + Tambah Laporan
+                </button>
+                <button class="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:border-indigo-500 hover:text-indigo-600">
+                    AR
+                    <span class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                </button>
+                <a href="components-auth.html" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm hover:border-rose-500 hover:text-rose-600">
+                    <span class="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-100 text-rose-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7l-4-4m0 0L8 7m4-4v12m5 4H7a2 2 0 01-2-2v-3" />
+                        </svg>
+                    </span>
+                    Logout
+                </a>
+            </div>
+
+            <button class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 md:hidden" id="menuToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 6h16M4 12h10M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile quick actions -->
+        <div class="border-t border-slate-200 bg-white/95 px-4 pb-3 pt-2 md:hidden" id="mobileMenu" style="display: none;">
+            <div class="flex gap-2">
+                <button class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50">
+                    Ringkasan
+                </button>
+                <button class="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-md shadow-indigo-600/30 hover:bg-indigo-700">
+                    Tambah Laporan
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten utama -->
+    <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="order-1 w-full space-y-4 hidden md:block lg:w-64 lg:sticky lg:top-20 self-start">
+            <!-- Profil & status -->
+            <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50">
+                <div class="flex items-center gap-3">
+                    <div class="relative h-11 w-11 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.35)_0,transparent_60%)]"></div>
+                        <span class="relative flex h-full w-full items-center justify-center text-sm font-semibold text-white">AD</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Selamat datang kembali,</p>
+                        <p class="text-sm font-semibold text-slate-900">Admin</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                    <div>
+                        <p class="text-[11px] uppercase tracking-wide text-slate-400">Level akses</p>
+                        <p class="text-xs font-semibold text-slate-700">Super Admin</p>
+                    </div>
+                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-600 ring-1 ring-emerald-500/20">
+                        Aktif
+                    </span>
+                </div>
+            </section>
+
+            <!-- Navigasi -->
+            <nav class="rounded-2xl border border-slate-200 bg-white p-3 text-xs text-slate-600 shadow-sm shadow-slate-200/50">
+
+                <!-- NAV UTAMA -->
+                <p class="mb-1 px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Navigasi utama</p>
+                <ul class="space-y-0.5 mb-3">
+                    <li>
+                        <a href="#" class="flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm shadow-indigo-600/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
+                            </svg>
+                            <span>Ringkasan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="laporan.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <span>Laporan & Analitik</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- APLIKASI -->
+                <p class="mb-1 px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Aplikasi</p>
+                <ul class="space-y-0.5 mb-3">
+                    <li>
+                        <a href="pengguna.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                            </svg>
+                            <span>Pengguna</span>
+                            <span class="ml-auto rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-600 ring-1 ring-emerald-500/20">Aktif</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="transaksi.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Transaksi</span>
+                            <span class="ml-auto text-[10px] text-slate-400">24 laporan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="sistem.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>Sistem</span>
+                            <span class="ml-auto inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold text-amber-600 ring-1 ring-amber-500/20">Beta</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- UI KOMPONEN -->
+                <p class="mb-1 px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">UI Komponen</p>
+                <ul class="space-y-0.5 mb-3">
+                    <li>
+                        <a href="components-buttons.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37L13 12m0 0l-2.59-2.37M13 12l-2.59 2.37M13 12l2.59-2.37M5 6h14"/>
+                            </svg>
+                            <span>Button & Card</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-forms.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h10M4 17h6"/>
+                            </svg>
+                            <span>Form & Upload</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-tables.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v4H4zM4 10h16v10H4z"/>
+                            </svg>
+                            <span>Tabel</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-modal.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16M8 8v12"/>
+                            </svg>
+                            <span>Modal</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-icons.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Ikon</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-empty.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
+                            <span>Halaman Kosong</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- AKSES -->
+                <p class="mb-1 px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Akses</p>
+                <ul class="space-y-0.5">
+                    <li>
+                        <a href="components-auth.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2m9-11a4 4 0 100-8 4 4 0 000 8z"/>
+                            </svg>
+                            <span>Login / Register</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-auth.html" class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-rose-600 hover:bg-rose-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7l-4-4m0 0L8 7m4-4v12m5 4H7a2 2 0 01-2-2v-3"/>
+                            </svg>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Area konten -->
+        <section id="mainContent" class="order-2 flex-1 space-y-5">
+            <nav class="text-[11px] text-slate-500" aria-label="Breadcrumb">
+                <span class="text-slate-500">Dashboard</span>
+                <span class="mx-1 text-slate-400">/</span>
+                <span class="text-slate-700">Ringkasan</span>
+            </nav>
+            <!-- Info atas -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-[0.18em] text-indigo-600">Ringkasan hari ini</p>
+                    <h2 class="mt-1 text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+                        Snapshot performa sistem kamu
+                    </h2>
+                </div>
+                <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-600 ring-1 ring-emerald-500/20">
+                        • Stabil
+                    </span>
+                    <span>Last update 2 menit lalu</span>
+                </div>
+            </div>
+
+                <!-- Kartu metrik -->
+            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <!-- Card 1 -->
+                <article class="group relative overflow-hidden rounded-2xl border border-slate-200 p-4 shadow-xl shadow-slate-200/50 summary-card-primary">
+                    <div class="relative flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Pengguna aktif</p>
+                            <p class="mt-1 text-2xl font-semibold text-slate-900">1.248</p>
+                        </div>
+                        <div class="rounded-full bg-white/70 p-2 ring-1 ring-slate-200/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="relative mt-3 flex items-center justify-between text-[11px]">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 font-medium text-emerald-600 ring-1 ring-emerald-500/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                            </svg>
+                            12% vs kemarin
+                        </span>
+                        <span class="text-slate-500">Realtime • 1m</span>
+                    </div>
+                </article>
+
+                <!-- Card 2 -->
+                <article class="relative overflow-hidden rounded-2xl border border-slate-200 p-4 shadow-xl shadow-slate-200/50 summary-card-info">
+                    <div class="relative flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Transaksi hari ini</p>
+                            <p class="mt-1 text-2xl font-semibold text-slate-900">Rp 32,5 jt</p>
+                        </div>
+                        <div class="rounded-full bg-white/70 p-2 ring-1 ring-slate-200/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="relative mt-3 flex items-center justify-between text-[11px]">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 font-medium text-emerald-600 ring-1 ring-emerald-500/20">
+                            +18,4% pertumbuhan
+                        </span>
+                        <span class="text-slate-500">Rata-rata: Rp 27 jt</span>
+                    </div>
+                </article>
+
+                <!-- Card 3 -->
+                <article class="relative overflow-hidden rounded-2xl border border-slate-200 p-4 shadow-xl shadow-slate-200/50 summary-card-warning">
+                    <div class="relative flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Tiket support</p>
+                            <p class="mt-1 text-2xl font-semibold text-slate-900">37</p>
+                        </div>
+                        <div class="rounded-full bg-white/70 p-2 ring-1 ring-slate-200/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="relative mt-3 flex items-center justify-between text-[11px]">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 font-medium text-amber-600 ring-1 ring-amber-500/20">
+                            12 butuh respon
+                        </span>
+                        <span class="text-slate-500">SLA: 1 jam 10 mnt</span>
+                    </div>
+                </article>
+
+                <!-- Card 4 -->
+                <article class="relative overflow-hidden rounded-2xl border border-slate-200 p-4 shadow-xl shadow-slate-200/50 summary-card-secondary">
+                    <div class="relative flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Kesehatan sistem</p>
+                            <p class="mt-1 text-2xl font-semibold text-slate-900">99,2%</p>
+                        </div>
+                        <div class="rounded-full bg-white/70 p-2 ring-1 ring-slate-200/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="relative mt-3 flex items-center justify-between text-[11px]">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 font-medium text-emerald-600 ring-1 ring-emerald-500/20">
+                            Uptime 30 hari: 99,98%
+                        </span>
+                        <span class="text-slate-500">0 insiden kritis</span>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Widget tambahan -->
+            <div class="mt-4 grid gap-3 lg:grid-cols-3">
+                <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Progress onboarding</p>
+                            <p class="text-sm font-semibold text-slate-800">Tim berhasil menyelesaikan 72% task</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-600 ring-1 ring-emerald-500/20">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                            On track
+                        </span>
+                    </div>
+                    <div class="mt-3">
+                        <div class="mb-1 flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Progress keseluruhan</span>
+                            <span class="font-semibold text-emerald-600">72%</span>
+                        </div>
+                        <div class="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div class="h-full w-[72%] rounded-full bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400"></div>
+                        </div>
+                        <p class="mt-2 text-[11px] text-slate-500">18 dari 25 task sudah selesai.</p>
+                    </div>
+                </section>
+
+                <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Aktivitas terbaru</p>
+                            <p class="text-sm font-semibold text-slate-800">Log singkat aktivitas penting</p>
+                        </div>
+                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-600">
+                            5 update
+                        </span>
+                    </div>
+                    <ol class="space-y-2">
+                        <li class="flex items-start gap-2">
+                            <span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                            <div>
+                                <p class="text-[11px] text-slate-800">User <span class="font-semibold">andi@company.com</span> berhasil login.</p>
+                                <p class="text-[10px] text-slate-500">2 menit lalu</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400"></span>
+                            <div>
+                                <p class="text-[11px] text-slate-800">Laporan penjualan harian di-export ke Excel.</p>
+                                <p class="text-[10px] text-slate-500">15 menit lalu</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="mt-1 h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+                            <div>
+                                <p class="text-[11px] text-slate-800">Ada 3 tiket support baru yang masuk.</p>
+                                <p class="text-[10px] text-slate-500">30 menit lalu</p>
+                            </div>
+                        </li>
+                    </ol>
+                </section>
+
+                <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Ringkasan sistem</p>
+                            <p class="text-sm font-semibold text-slate-800">Status singkat resource dan error</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                            Normal
+                        </span>
+                    </div>
+                    <div class="space-y-2 text-[11px]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">CPU usage</span>
+                            <span class="font-semibold text-slate-800">38%</span>
+                        </div>
+                        <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div class="h-full w-[38%] rounded-full bg-indigo-500"></div>
+                        </div>
+                        <div class="mt-2 flex items-center justify-between">
+                            <span class="text-slate-400">Memory usage</span>
+                            <span class="font-semibold text-slate-800">62%</span>
+                        </div>
+                        <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div class="h-full w-[62%] rounded-full bg-sky-400"></div>
+                        </div>
+                        <div class="mt-2 flex items-center justify-between">
+                            <span class="text-slate-400">Error 24 jam terakhir</span>
+                            <span class="font-semibold text-emerald-600">0 critical • 4 minor</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Area grafik & tabel -->
+            <div class="grid gap-4 lg:grid-cols-3">
+                <!-- Grafik -->
+                <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/50 lg:col-span-2">
+                    <div class="relative flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Traffic & performa</p>
+                            <p class="text-sm font-semibold text-slate-800">Grafik kunjungan 7 hari terakhir</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px]">
+                            <button class="rounded-full bg-slate-100 px-2 py-1 text-slate-600 ring-1 ring-slate-200">7 hari</button>
+                            <button class="rounded-full bg-transparent px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800">30 hari</button>
+                        </div>
+                    </div>
+
+                    <div class="relative mt-4 h-56 w-full rounded-xl bg-gradient-to-b from-slate-100 via-white to-white p-3">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_10%_0,rgba(129,140,248,0.35),transparent_55%),radial-gradient(circle_at_90%_100%,rgba(45,212,191,0.25),transparent_55%)] opacity-80"></div>
+                        <div class="relative h-full w-full rounded-lg border border-slate-200/80 bg-white/60">
+                            <!-- Fake chart grid -->
+                            <div class="absolute inset-0">
+                                <div class="h-full w-full bg-[linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.16)_1px,transparent_1px)] bg-[size:48px_1fr,1fr_40px]"></div>
+                            </div>
+                            <!-- Fake line -->
+                            <svg class="relative h-full w-full" viewBox="0 0 400 160" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#6366f1"/>
+                                        <stop offset="50%" stop-color="#22d3ee"/>
+                                        <stop offset="100%" stop-color="#22c55e"/>
+                                    </linearGradient>
+                                    <linearGradient id="fillGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="rgba(94, 234, 212, 0.28)"/>
+                                        <stop offset="100%" stop-color="rgba(15,23,42,0.2)"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0 110 C 40 100 50 85 80 92 C 110 99 120 70 155 78 C 190 86 200 52 235 60 C 270 68 280 44 310 52 C 340 60 355 30 400 40" fill="none" stroke="url(#lineGradient)" stroke-width="3.2" stroke-linecap="round"/>
+                                <path d="M0 110 C 40 100 50 85 80 92 C 110 99 120 70 155 78 C 190 86 200 52 235 60 C 270 68 280 44 310 52 C 340 60 355 30 400 40 L 400 160 L 0 160 Z" fill="url(#fillGradient)" opacity="0.9"/>
+                                <g fill="#22c55e">
+                                    <circle cx="80" cy="92" r="4"/>
+                                    <circle cx="155" cy="78" r="4"/>
+                                    <circle cx="235" cy="60" r="4"/>
+                                    <circle cx="310" cy="52" r="4"/>
+                                    <circle cx="400" cy="40" r="4"/>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="relative mt-3 flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-700 ring-1 ring-slate-200">
+                                <span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span>
+                                Pengunjung
+                            </span>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-700 ring-1 ring-slate-200">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                                Konversi
+                            </span>
+                        </div>
+                        <p>Peak traffic: <span class="font-semibold text-slate-800">19:00 - 21:00</span></p>
+                    </div>
+                </section>
+
+                <!-- Tabel ringkas -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Top modul</p>
+                            <p class="text-xs text-slate-600">Modul dengan aktivitas tertinggi</p>
+                        </div>
+                        <button class="rounded-full bg-slate-100 px-3 py-1 text-[11px] text-slate-600 ring-1 ring-slate-200 hover:bg-slate-200">
+                            Export
+                        </button>
+                    </div>
+                    <div class="overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-100">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">Modul</th>
+                                    <th class="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-500">User</th>
+                                    <th class="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-500">Perubahan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr class="hover:bg-slate-200/70">
+                                    <td class="px-3 py-2">
+                                        <p class="text-xs font-medium text-slate-800">Manajemen User</p>
+                                        <p class="text-[10px] text-slate-500">Role & permission</p>
+                                    </td>
+                                    <td class="px-3 py-2 text-right text-xs text-slate-700">312</td>
+                                    <td class="px-3 py-2 text-right text-xs text-emerald-600">+24%</td>
+                                </tr>
+                                <tr class="hover:bg-slate-200/70">
+                                    <td class="px-3 py-2">
+                                        <p class="text-xs font-medium text-slate-800">Transaksi</p>
+                                        <p class="text-[10px] text-slate-500">Pembayaran & refund</p>
+                                    </td>
+                                    <td class="px-3 py-2 text-right text-xs text-slate-700">189</td>
+                                    <td class="px-3 py-2 text-right text-xs text-emerald-600">+12%</td>
+                                </tr>
+                                <tr class="hover:bg-slate-200/70">
+                                    <td class="px-3 py-2">
+                                        <p class="text-xs font-medium text-slate-800">Laporan</p>
+                                        <p class="text-[10px] text-slate-500">Export & analitik</p>
+                                    </td>
+                                    <td class="px-3 py-2 text-right text-xs text-slate-700">124</td>
+                                    <td class="px-3 py-2 text-right text-xs text-slate-400">+4%</td>
+                                </tr>
+                                <tr class="hover:bg-slate-200/70">
+                                    <td class="px-3 py-2">
+                                        <p class="text-xs font-medium text-slate-800">Notifikasi</p>
+                                        <p class="text-[10px] text-slate-500">Email & in-app</p>
+                                    </td>
+                                    <td class="px-3 py-2 text-right text-xs text-slate-700">78</td>
+                                    <td class="px-3 py-2 text-right text-xs text-rose-600">-3%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Timeline modern -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Timeline aktivitas</p>
+                            <p class="text-sm font-semibold text-slate-800">Pergerakan penting hari ini</p>
+                        </div>
+                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-600">
+                            Realtime
+                        </span>
+                    </div>
+                    <ol class="relative space-y-3 border-l border-slate-200 pl-3">
+                        <li class="group relative">
+                            <div class="absolute -left-[9px] mt-1.5 h-3 w-3 rounded-full border border-emerald-300 bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.25)]"></div>
+                            <div class="rounded-xl bg-slate-50 px-3 py-2">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[11px] font-semibold text-slate-800">User baru terdaftar</p>
+                                    <span class="text-[10px] text-emerald-600">2 menit lalu</span>
+                                </div>
+                                <p class="mt-0.5 text-[11px] text-slate-400">andika bergabung sebagai admin cabang Bandung.</p>
+                            </div>
+                        </li>
+                        <li class="group relative">
+                            <div class="absolute -left-[9px] mt-1.5 h-3 w-3 rounded-full border border-sky-300 bg-sky-500 shadow-[0_0_0_4px_rgba(56,189,248,0.25)]"></div>
+                            <div class="rounded-xl bg-slate-50 px-3 py-2">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[11px] font-semibold text-slate-800">Batch transaksi diproses</p>
+                                    <span class="text-[10px] text-sky-600">10 menit lalu</span>
+                                </div>
+                                <p class="mt-0.5 text-[11px] text-slate-400">24 transaksi berhasil disinkronkan ke sistem finance.</p>
+                            </div>
+                        </li>
+                        <li class="group relative">
+                            <div class="absolute -left-[9px] mt-1.5 h-3 w-3 rounded-full border border-amber-300 bg-amber-400 shadow-[0_0_0_4px_rgba(251,191,36,0.25)]"></div>
+                            <div class="rounded-xl bg-slate-50 px-3 py-2">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[11px] font-semibold text-slate-800">Peringatan storage</p>
+                                    <span class="text-[10px] text-amber-600">30 menit lalu</span>
+                                </div>
+                                <p class="mt-0.5 text-[11px] text-slate-400">Penggunaan storage mendekati 80% dari kapasitas.</p>
+                            </div>
+                        </li>
+                        <li class="group relative">
+                            <div class="absolute -left-[9px] mt-1.5 h-3 w-3 rounded-full border border-rose-300 bg-rose-500 shadow-[0_0_0_4px_rgba(248,113,113,0.25)]"></div>
+                            <div class="rounded-xl bg-slate-50 px-3 py-2">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[11px] font-semibold text-slate-800">Percobaan login gagal</p>
+                                    <span class="text-[10px] text-rose-600">1 jam lalu</span>
+                                </div>
+                                <p class="mt-0.5 text-[11px] text-slate-400">3 kali percobaan login dari IP yang belum terdaftar.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </section>
+            </div>
+
+            <!-- Baris bawah -->
+            <div class="grid gap-4 lg:grid-cols-3">
+                <!-- Status server -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Status server</p>
+                            <p class="text-xs text-slate-600">Monitoring cluster utama</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-600 ring-1 ring-emerald-500/20">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                            Semua normal
+                        </span>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="mb-1 flex items-center justify-between text-[11px] text-slate-400">
+                                <span>CPU usage</span>
+                                <span class="text-slate-700">63%</span>
+                            </div>
+                            <div class="h-1.5 rounded-full bg-slate-200">
+                                <div class="h-full w-[63%] rounded-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="mb-1 flex items-center justify-between text-[11px] text-slate-400">
+                                <span>Memory</span>
+                                <span class="text-slate-700">72%</span>
+                            </div>
+                            <div class="h-1.5 rounded-full bg-slate-200">
+                                <div class="h-full w-[72%] rounded-full bg-gradient-to-r from-sky-500 to-emerald-400"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="mb-1 flex items-center justify-between text-[11px] text-slate-400">
+                                <span>Storage</span>
+                                <span class="text-slate-700">80%</span>
+                            </div>
+                            <div class="h-1.5 rounded-full bg-slate-200">
+                                <div class="h-full w-[80%] rounded-full bg-gradient-to-r from-amber-400 to-rose-500"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- To-do admin -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">To-do admin</p>
+                            <p class="text-xs text-slate-600">Hal yang perlu kamu follow up</p>
+                        </div>
+                        <button class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-600 ring-1 ring-slate-200 hover:bg-slate-200">
+                            + Tambah
+                        </button>
+                    </div>
+                    <ul class="space-y-2 text-[11px]">
+                        <li class="flex items-start gap-2 rounded-xl bg-slate-50 px-3 py-2">
+                            <input type="checkbox" checked class="mt-0.5 h-3 w-3 rounded border-slate-600 bg-slate-200 text-indigo-500 focus:ring-0">
+                            <div>
+                                <p class="text-slate-700">Review 5 tiket dengan prioritas tinggi.</p>
+                                <p class="text-[10px] text-slate-500">Deadline: hari ini</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2 rounded-xl px-3 py-2 hover:bg-slate-50">
+                            <input type="checkbox" class="mt-0.5 h-3 w-3 rounded border-slate-600 bg-slate-200 text-indigo-500 focus:ring-0">
+                            <div>
+                                <p class="text-slate-700">Cek log keamanan untuk login mencurigakan.</p>
+                                <p class="text-[10px] text-slate-500">Deadline: 3 jam lagi</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2 rounded-xl px-3 py-2 hover:bg-slate-50">
+                            <input type="checkbox" class="mt-0.5 h-3 w-3 rounded border-slate-600 bg-slate-200 text-indigo-500 focus:ring-0">
+                            <div>
+                                <p class="text-slate-700">Update dokumentasi modul pembayaran.</p>
+                                <p class="text-[10px] text-slate-500">Deadline: minggu ini</p>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Panel cepat -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-xl shadow-slate-200/50">
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">Quick actions</p>
+                            <p class="text-xs text-slate-600">Aksi cepat untuk admin</p>
+                        </div>
+                    </div>
+                    <div class="grid gap-2 text-[11px]">
+                        <button class="flex items-center justify-between rounded-xl bg-indigo-500/10 px-3 py-2 text-indigo-100 ring-1 ring-indigo-500/40 hover:bg-indigo-500/20">
+                            <span class="flex items-center gap-2">
+                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/30 text-indigo-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </span>
+                                Tambah user baru
+                            </span>
+                            <span>Ctrl + U</span>
+                        </button>
+                        <button class="flex items-center justify-between rounded-xl bg-slate-100 px-3 py-2 text-slate-700 ring-1 ring-slate-200 hover:bg-slate-200">
+                            <span class="flex items-center gap-2">
+                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-200 text-slate-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m0-8L8 12m4-4l4 4m-4 4H5a2 2 0 01-2-2V6a2 2 0 012-2h6l6 6v4a2 2 0 01-2 2h-3z"/>
+                                    </svg>
+                                </span>
+                                Generate laporan bulanan
+                            </span>
+                            <span>Ctrl + L</span>
+                        </button>
+                        <button class="flex items-center justify-between rounded-xl bg-slate-100 px-3 py-2 text-slate-700 ring-1 ring-slate-200 hover:bg-slate-200">
+                            <span class="flex items-center gap-2">
+                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-200 text-slate-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </span>
+                                Mode pantau real-time
+                            </span>
+                            <span>Ctrl + R</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-100/80 px-4 py-4 sm:px-6 lg:px-8">
+        <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 text-[11px] text-slate-500 sm:flex-row">
+            <p class="text-center sm:text-left">
+                © 2026 Dashboard Admin. Tampilan modern untuk memantau sistem dengan nyaman.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="components.html" class="hover:text-indigo-600">Bantuan</a>
+                <a href="index.html" class="hover:text-indigo-600">Kebijakan</a>
+                <a href="sistem.html" class="hover:text-indigo-600">Status sistem</a>
+            </div>
+        </div>
+    </footer>
+
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

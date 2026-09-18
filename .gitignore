@@ -1,0 +1,9 @@
+# Backup & script
+*.zip
+*.bat
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log

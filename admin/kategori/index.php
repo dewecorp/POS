@@ -1,0 +1,60 @@
+<?php
+require_once __DIR__.'/../../config/app.php';
+require_once __DIR__.'/../../config/database.php';
+require_once __DIR__.'/../../core/auth.php';
+require_once __DIR__.'/../../core/helper.php';
+require_once __DIR__.'/../../core/csrf.php';
+require_once __DIR__.'/../../core/audit.php';
+require_role(['admin','manager','owner']);
+$pdo=db();
+$msg='';
+if($_SERVER['REQUEST_METHOD']==='POST'){
+  if(!csrf_verify($_POST['_csrf']??'')) { flash_set('error','CSRF tidak valid'); redirect($_SERVER['REQUEST_URI']); }
+  $act=$_POST['act']??'';
+  if($act==='create'){
+    $code=trim($_POST['code']??''); $name=trim($_POST['name']??''); $desc=trim($_POST['description']??'');
+    if($code===''||$name===''){ flash_set('error','Kode dan nama wajib'); redirect($_SERVER['REQUEST_URI']); }
+    try{ $pdo->prepare("INSERT INTO product_categories (code,name,description) VALUES (?,?,?)")->execute([$code,$name,$desc]); audit('CREATE_CATEGORY','products',null,"Buat kategori $code"); flash_set('success','Kategori ditambahkan'); }catch(PDOException $e){ flash_set('error','Kode sudah ada'); }
+    redirect($_SERVER['REQUEST_URI']);
+  } elseif($act==='update'){
+    $id=(int)$_POST['id']; $code=trim($_POST['code']); $name=trim($_POST['name']); $desc=trim($_POST['description']); $active=(int)($_POST['is_active']??1);
+    $pdo->prepare("UPDATE product_categories SET code=?,name=?,description=?,is_active=? WHERE id=?")->execute([$code,$name,$desc,$active,$id]); audit('UPDATE_CATEGORY','products',$id,"Update kategori $code"); flash_set('success','Kategori diupdate'); redirect($_SERVER['REQUEST_URI']);
+  } elseif($act==='delete'){
+    $id=(int)$_POST['id'];
+    $cnt=$pdo->prepare("SELECT COUNT(*) FROM products WHERE category_id=?"); $cnt->execute([$id]);
+    if($cnt->fetchColumn()>0){ flash_set('error','Kategori masih dipakai produk'); redirect($_SERVER['REQUEST_URI']); }
+    $pdo->prepare("DELETE FROM product_categories WHERE id=?")->execute([$id]); audit('DELETE_CATEGORY','products',$id,"Hapus kategori"); flash_set('success','Kategori dihapus'); redirect($_SERVER['REQUEST_URI']);
+  }
+}
+$q=trim($_GET['q']??''); $page=max(1,(int)($_GET['page']??1)); $per=ITEMS_PER_PAGE;
+$where="WHERE 1"; $params=[];
+if($q!==''){ $where.=" AND (code LIKE ? OR name LIKE ?)"; $params[]="%$q%"; $params[]="%$q%"; }
+$total=$pdo->prepare("SELECT COUNT(*) FROM product_categories $where"); $total->execute($params); $total=(int)$total->fetchColumn();
+list($pages,$page,$off)=paginate_params($total,$page,$per);
+$stmt=$pdo->prepare("SELECT * FROM product_categories $where ORDER BY id DESC LIMIT $per OFFSET $off"); $stmt->execute($params); $rows=$stmt->fetchAll();
+?>
+<!DOCTYPE html><html lang="id"><head><title>Kategori • <?=e(APP_NAME)?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
+<body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../../components/header.php'; ?>
+<main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../../components/sidebar_admin.php'; ?>
+<section class="order-2 flex-1 space-y-4">
+<nav class="text-[11px] text-slate-500">Dashboard / Kategori</nav>
+<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><h2 class="text-lg font-semibold">Kategori Produk</h2><button data-modal-toggle="#modalAdd" class="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white">+ Tambah Kategori</button></div>
+<form method="GET" class="flex gap-2"><input name="q" value="<?=e($q)?>" placeholder="Cari kode/nama" class="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"><button class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs">Cari</button></form>
+<div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+<div class="overflow-hidden rounded-xl border border-slate-200"><table class="min-w-full divide-y divide-slate-200 text-xs"><thead class="bg-slate-100"><tr><th class="px-3 py-2 text-left">Kode</th><th class="px-3 py-2 text-left">Nama</th><th class="px-3 py-2 text-left">Deskripsi</th><th class="px-3 py-2 text-center">Status</th><th class="px-3 py-2 text-center">Aksi</th></tr></thead><tbody class="divide-y">
+<?php foreach($rows as $r):?><tr class="hover:bg-slate-50"><td class="px-3 py-2 font-medium"><?=e($r['code'])?></td><td class="px-3 py-2"><?=e($r['name'])?></td><td class="px-3 py-2 text-slate-500"><?=e($r['description'])?></td><td class="px-3 py-2 text-center"><?=$r['is_active']?'<span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] text-emerald-600 ring-1 ring-emerald-200">Aktif</span>':'<span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px]">Nonaktif</span>'?></td>
+<td class="px-3 py-2 text-center flex justify-center gap-1"><button type="button" data-modal-toggle="#modalEdit<?=$r['id']?>" title="Edit" class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><form method="POST" class="inline" onsubmit="return confirm('Hapus kategori?')"><input type="hidden" name="_csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="act" value="delete"><input type="hidden" name="id" value="<?=$r['id']?>"><button title="Hapus" class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></form></td></tr>
+<?php endforeach; if(!$rows) echo '<tr><td colspan="5" class="px-3 py-6 text-center text-slate-400">Belum ada data</td></tr>';?>
+</tbody></table></div>
+<div class="mt-3 flex justify-between text-xs text-slate-500"><span><?=$total?> data • hal <?=$page?>/<?=$pages?></span><div class="flex gap-1"><?php for($i=1;$i<=$pages;$i++):?><a href="?q=<?=urlencode($q)?>&page=<?=$i?>" class="rounded-full border px-3 py-1 <?=$i==$page?'bg-emerald-600 text-white border-emerald-600':''?>"><?=$i?></a><?php endfor;?></div></div>
+</div>
+</section></main>
+
+<!-- Modals Edit Kategori -->
+<?php foreach($rows as $r):?>
+<div id="modalEdit<?=$r['id']?>" class="modal-dashboard hidden"><div class="modal-dialog max-w-sm"><div class="modal-content"><div class="flex justify-between mb-3"><h3 class="text-sm font-semibold">Edit Kategori</h3><button type="button" data-modal-hide="#modalEdit<?=$r['id']?>" class="btn-close"></button></div>
+<form method="POST" class="space-y-2"><input type="hidden" name="_csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="act" value="update"><input type="hidden" name="id" value="<?=$r['id']?>"><input name="code" value="<?=e($r['code'])?>" required class="w-full rounded-xl border px-3 py-2 text-xs"><input name="name" value="<?=e($r['name'])?>" required class="w-full rounded-xl border px-3 py-2 text-xs"><textarea name="description" class="w-full rounded-xl border px-3 py-2 text-xs"><?=e($r['description'])?></textarea><select name="is_active" class="w-full rounded-xl border px-3 py-2 text-xs"><option value="1" <?=$r['is_active']?'selected':''?>>Aktif</option><option value="0" <?=!$r['is_active']?'selected':''?>>Nonaktif</option></select><button class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-semibold text-white">Simpan</button></form></div></div></div>
+<?php endforeach;?>
+<div id="modalAdd" class="modal-dashboard hidden"><div class="modal-dialog max-w-sm"><div class="modal-content"><div class="flex justify-between mb-3"><h3 class="text-sm font-semibold">Tambah Kategori</h3><button data-modal-hide="#modalAdd" class="btn-close"></button></div>
+<form method="POST" class="space-y-2"><input type="hidden" name="_csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="act" value="create"><input name="code" required placeholder="Kode (CAT006)" class="w-full rounded-xl border px-3 py-2 text-xs"><input name="name" required placeholder="Nama kategori" class="w-full rounded-xl border px-3 py-2 text-xs"><textarea name="description" placeholder="Deskripsi" class="w-full rounded-xl border px-3 py-2 text-xs"></textarea><button class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-semibold text-white">Simpan</button></form></div></div></div>
+<?php include __DIR__.'/../../components/footer.php'; ?></body></html>

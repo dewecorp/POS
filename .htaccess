@@ -1,0 +1,26 @@
+DirectoryIndex index.php
+Options -Indexes
+RewriteEngine On
+RewriteBase /POS/
+
+RewriteRule ^index\.html$ index.php [R=302,L]
+RewriteRule ^.*\.html$ index.php [R=302,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^login$ login.php [L]
+RewriteRule ^logout$ logout.php [L]
+RewriteRule ^admin$ admin/index.php [L]
+RewriteRule ^kasir$ kasir/index.php [L]
+
+<FilesMatch "\.(php|phtml)$">
+  Header set X-Content-Type-Options nosniff
+</FilesMatch>
+Header set X-Frame-Options SAMEORIGIN
+Header set Referrer-Policy strict-origin-when-cross-origin
+Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+Header set Pragma "no-cache"
+
+<FilesMatch "^(config|database|\.env)">
+  Require all denied
+</FilesMatch>
