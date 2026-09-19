@@ -205,3 +205,65 @@ Swal.fire({
 });
 <?php endif; ?>
 </script>
+<script>
+(function(){
+    var csrfToken = <?=json_encode(csrf_token())?>;
+    var updateUrl = <?=json_encode(url('/api/system_update'))?>;
+    function attachUpdate(btnId){
+        var btn = document.getElementById(btnId);
+        if(!btn) return;
+        btn.addEventListener('click', function(){
+            Swal.fire({
+                icon: 'question',
+                title: 'Update Sistem?',
+                html: 'Sistem akan <b>git pull</b> dari GitHub.<br>Proses meliputi: cek remote, fetch, scan backdoor, lalu pull.<br>Ubah ini hanya jika yakin koneksi aman.',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Update',
+                cancelButtonText: 'Batal',
+                buttonsStyling: false,
+                customClass: { confirmButton: 'swal-btn-confirm', cancelButton: 'swal-btn-cancel' }
+            }).then(function(r){
+                if(!r.isConfirmed) return;
+                Swal.fire({
+                    title: 'Memproses Update...',
+                    html: 'Menghubungi GitHub & memindai perubahan...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: function(){ Swal.showLoading(); }
+                });
+                fetch(updateUrl, {
+                    method: 'POST',
+                    headers: {'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json'},
+                    body: JSON.stringify({action:'update'})
+                }).then(function(res){
+                    return res.json().then(function(j){
+                        if(!res.ok || !j.success){
+                            var msg = (j && j.message) ? j.message : 'Update gagal (HTTP '+res.status+')';
+                            throw new Error(msg);
+                        }
+                        return j;
+                    });
+                }).then(function(j){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Update Berhasil',
+                        html: '<div style="text-align:left;font-size:11px;max-height:240px;overflow-y:auto;white-space:pre-wrap;word-break:break-all" class="bg-slate-50 border rounded-xl p-2">' + (j.data && j.data.commit ? 'Commit: '+j.data.commit+'\n' : '') + (j.message||'') + '</div>',
+                        buttonsStyling: false,
+                        customClass: { confirmButton: 'swal-btn-confirm' }
+                    }).then(function(){ location.reload(); });
+                }).catch(function(err){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Gagal',
+                        html: '<div style="text-align:left;font-size:11px;max-height:240px;overflow-y:auto;white-space:pre-wrap;word-break:break-all" class="bg-rose-50 border border-rose-200 rounded-xl p-2 text-rose-700">' + (err.message||'Gagal') + '</div>',
+                        buttonsStyling: false,
+                        customClass: { confirmButton: 'swal-btn-confirm' }
+                    });
+                });
+            });
+        });
+    }
+    attachUpdate('btnSystemUpdate');
+    attachUpdate('btnSystemUpdateMobile');
+})();
+</script>

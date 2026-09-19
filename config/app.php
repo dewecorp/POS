@@ -23,3 +23,6 @@ define('DEFAULT_TAX', 0);
 define('ALLOW_NEGATIVE_STOCK', false);
 define('UPLOAD_MAX_MB', 2);
 define('ITEMS_PER_PAGE', 15);
+define('ALLOWED_UPDATE_ROLES', ['admin','owner']);
+define('UPDATE_GIT_REMOTE', 'origin');
+define('UPDATE_GIT_URL', 'https://github.com/dewecorp/POS.git');
