@@ -1,10 +1,11 @@
 <?php
-$DB_HOST = '127.0.0.1';
-$DB_NAME = 'pos_db';
-$DB_USER = 'root';
-$DB_PASS = '';
-$DB_CHARSET = 'utf8mb4';
-$DB_PORT = 3306;
+if(file_exists(__DIR__.'/local.php')) require __DIR__.'/local.php';
+if(!isset($DB_HOST)) $DB_HOST = '127.0.0.1';
+if(!isset($DB_NAME)) $DB_NAME = 'pos_db';
+if(!isset($DB_USER)) $DB_USER = 'root';
+if(!isset($DB_PASS)) $DB_PASS = '';
+if(!isset($DB_CHARSET)) $DB_CHARSET = 'utf8mb4';
+if(!isset($DB_PORT)) $DB_PORT = 3306;
 
 function db(): PDO {
     static $pdo = null;

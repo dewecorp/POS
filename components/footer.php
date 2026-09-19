@@ -216,7 +216,6 @@ Swal.fire({
             Swal.fire({
                 icon: 'question',
                 title: 'Update Sistem?',
-                html: 'Sistem akan <b>git pull</b> dari GitHub.<br>Proses meliputi: cek remote, fetch, scan backdoor, lalu pull.<br>Ubah ini hanya jika yakin koneksi aman.',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Update',
                 cancelButtonText: 'Batal',
