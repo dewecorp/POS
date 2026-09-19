@@ -16,9 +16,9 @@ if($q!==''){
 ?>
 <!DOCTYPE html><html lang="id"><head><title>Cek Harga • <?=e(APP_NAME)?></title><?php include __DIR__.'/../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../components/header.php';?>
-<div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2 flex gap-2 text-xs"><a href="<?=url('/kasir/index')?>" class="rounded-full border bg-white px-4 py-2">PENJUALAN</a><a href="<?=url('/kasir/cek-harga')?>" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold">CEK HARGA</a><a href="<?=url('/kasir/history')?>" class="rounded-full border bg-white px-4 py-2">HISTORY</a></div>
-<main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../components/sidebar_kasir.php';?>
-<section class="order-2 flex-1 space-y-4">
+<div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2.5 flex gap-2 text-sm"><a href="<?=url('/kasir/index')?>" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 font-medium text-slate-600 hover:bg-slate-50"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>PENJUALAN <span class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">F1</span></a><a href="<?=url('/kasir/cek-harga')?>" class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-white font-semibold shadow-sm"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>CEK HARGA <span class="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">F3</span></a><a href="<?=url('/kasir/history')?>" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 font-medium text-slate-600 hover:bg-slate-50"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>HISTORY <span class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">F4</span></a></div>
+<main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8">
+<section class="flex-1 space-y-4">
 <h2 class="text-lg font-semibold">Cek Harga</h2>
 <form id="formCekHarga" class="flex gap-2" method="GET">
 <input id="inputCekHarga" name="q" value="<?=e($q)?>" autofocus placeholder="Scan barcode / SKU / nama produk" class="flex-1 rounded-xl border px-3 py-3 text-sm focus:border-emerald-500 focus:outline-none">
@@ -37,6 +37,11 @@ if(inp && form){
     }
   });
 }
+document.addEventListener('keydown',e=>{
+ if(e.key==='F1'){ e.preventDefault(); window.location.href='<?=url('/kasir/index')?>'; }
+ if(e.key==='F3'){ e.preventDefault(); if(inp) inp.focus(); }
+ if(e.key==='F4'){ e.preventDefault(); window.location.href='<?=url('/kasir/history')?>'; }
+});
 </script>
 <?php if($q!=='' && !$product):?><div class="rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 text-sm text-rose-700">Produk tidak ditemukan: <?=e($q)?></div><?php endif;?>
 <?php if($product):?>

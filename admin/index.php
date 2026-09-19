@@ -4,7 +4,7 @@ require_once __DIR__.'/../config/database.php';
 require_once __DIR__.'/../core/auth.php';
 require_once __DIR__.'/../core/helper.php';
 require_once __DIR__.'/../core/audit.php';
-require_role(['admin','manager','owner','kasir']);
+require_role(['admin','manager','owner']);
 $pdo=db();
 $today=date('Y-m-d');
 $st=$pdo->query("SELECT COUNT(*) c, COALESCE(SUM(grand_total),0) s FROM sales WHERE DATE(created_at)='$today' AND status='completed'")->fetch();
