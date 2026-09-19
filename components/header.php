@@ -51,7 +51,7 @@ $hariIni = $hariList[date('l')].', '.date('j').' '.$bulanList[date('F')].' '.dat
       Dashboard Admin
     </a>
     <?php endif; ?>
-    <?php if(in_array($role,ALLOWED_UPDATE_ROLES,true)): ?>
+    <?php if(in_array($role, defined('ALLOWED_UPDATE_ROLES') ? ALLOWED_UPDATE_ROLES : [], true)): ?>
     <button type="button" id="btnSystemUpdate" class="flex w-full items-center gap-2 px-4 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-sky-50 hover:text-sky-600">
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
       Update Sistem
@@ -75,7 +75,7 @@ $hariIni = $hariList[date('l')].', '.date('j').' '.$bulanList[date('F')].' '.dat
   <?php if(in_array($role,['admin','manager','owner'],true)): ?>
   <a href="<?=url('/admin')?>" class="mb-2 flex items-center justify-center gap-1.5 rounded-lg bg-white/15 px-3 py-2 text-center text-xs font-medium text-white shadow hover:bg-white/25"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/></svg>Dashboard Admin</a>
   <?php endif; ?>
-  <?php if(in_array($role,ALLOWED_UPDATE_ROLES,true)): ?>
+  <?php if(in_array($role, defined('ALLOWED_UPDATE_ROLES') ? ALLOWED_UPDATE_ROLES : [], true)): ?>
   <button type="button" id="btnSystemUpdateMobile" class="mb-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-center text-xs font-medium text-white shadow hover:bg-sky-700"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Update Sistem</button>
   <?php endif; ?>
   <a href="<?=url('/logout')?>" class="block w-full rounded-lg bg-rose-600 px-3 py-2 text-center text-xs font-medium text-white shadow">Logout</a>

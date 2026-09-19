@@ -138,7 +138,7 @@
         });
 
         // Intercept link logout
-        document.querySelectorAll('a[href*="logout.php"]').forEach(function(link) {
+        document.querySelectorAll('a[href*="logout"], a[href*="Logout"]').forEach(function(link) {
             if (link.dataset.swalLogoutBound) return;
             link.dataset.swalLogoutBound = '1';
             link.addEventListener('click', function(e) {
@@ -207,7 +207,7 @@ Swal.fire({
 </script>
 <script>
 (function(){
-    var csrfToken = <?=json_encode(csrf_token())?>;
+    var csrfToken = <?= json_encode((function(){ if(session_status()!==PHP_SESSION_ACTIVE) @session_start(); if(empty($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(random_bytes(32)); return $_SESSION['csrf_token']; })()) ?>;
     var updateUrl = <?=json_encode(url('/api/system_update'))?>;
     function attachUpdate(btnId){
         var btn = document.getElementById(btnId);
