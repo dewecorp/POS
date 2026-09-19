@@ -177,7 +177,7 @@ if($printView): ?>
 </div>
 </body></html>
 <?php exit; endif; ?>
-<!DOCTYPE html><html lang="id"><head><title>Laporan • <?=e(APP_NAME)?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
+<!DOCTYPE html><html lang="id"><head><title>Laporan • <?=e((store_info()['name'] ?? APP_NAME))?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../../components/header.php';?>
 <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../../components/sidebar_admin.php';?>
 <section class="order-2 flex-1 space-y-4">

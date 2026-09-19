@@ -46,7 +46,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 $sales=$pdo->query("SELECT s.id,s.transaction_number,s.grand_total,s.created_at FROM sales s WHERE s.status='completed' ORDER BY s.id DESC LIMIT 50")->fetchAll();
 $rets=$pdo->query("SELECT r.*, s.transaction_number, u.name as user FROM returns r JOIN sales s ON s.id=r.sale_id JOIN users u ON u.id=r.user_id ORDER BY r.id DESC LIMIT 20")->fetchAll();
 ?>
-<!DOCTYPE html><html lang="id"><head><title>Retur • <?=e(APP_NAME)?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
+<!DOCTYPE html><html lang="id"><head><title>Retur • <?=e((store_info()['name'] ?? APP_NAME))?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../../components/header.php';?>
 <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../../components/sidebar_admin.php';?>
 <section class="order-2 flex-1 space-y-4">

@@ -61,7 +61,7 @@ $expRows=$pdo->query("SELECT e.*, u.name as user FROM expenses e LEFT JOIN users
 $myShift=$pdo->prepare("SELECT * FROM cashier_shifts WHERE user_id=? AND status='open' ORDER BY id DESC LIMIT 1"); $myShift->execute([current_user()['id']]); $myShift=$myShift->fetch();
 $shifts=$pdo->query("SELECT sh.*, u.name as user FROM cashier_shifts sh JOIN users u ON u.id=sh.user_id ORDER BY sh.id DESC LIMIT 10")->fetchAll();
 ?>
-<!DOCTYPE html><html lang="id"><head><title>Kas • <?=e(APP_NAME)?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
+<!DOCTYPE html><html lang="id"><head><title>Kas • <?=e((store_info()['name'] ?? APP_NAME))?></title><?php include __DIR__.'/../../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col"><?php include __DIR__.'/../../components/header.php';?>
 <main class="flex w-full flex-1 flex-col gap-6 px-4 pb-10 pt-5 sm:px-6 lg:px-8 lg:flex-row lg:items-start"><?php include __DIR__.'/../../components/sidebar_admin.php';?>
 <section class="order-2 flex-1 space-y-4">

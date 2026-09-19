@@ -12,7 +12,7 @@ $store=$pdo->query("SELECT * FROM stores LIMIT 1")->fetch();
 $tax=(float)($pdo->query("SELECT value FROM settings WHERE `key`='tax_percent'")->fetchColumn() ?: 0);
 $quick=$pdo->query("SELECT * FROM products WHERE is_active=1 ORDER BY stock DESC LIMIT 12")->fetchAll();
 ?>
-<!DOCTYPE html><html lang="id"><head><title>POS Kasir • <?=e(APP_NAME)?></title><?php include __DIR__.'/../components/head.php'; ?></head>
+<!DOCTYPE html><html lang="id"><head><title>POS Kasir • <?=e((store_info()['name'] ?? APP_NAME))?></title><?php include __DIR__.'/../components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
 <?php include __DIR__.'/../components/header.php'; ?>
 <div class="border-b bg-white px-4 sm:px-6 lg:px-8 py-2.5 flex gap-2 text-sm overflow-auto">

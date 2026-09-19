@@ -44,7 +44,7 @@ $stLogo=store_logo_url();
 $stName=store_info()['name'] ?? APP_NAME;
 ?>
 <!DOCTYPE html>
-<html lang="id"><head><title>Login • <?=e(APP_NAME)?></title><?php include __DIR__.'/components/head.php'; ?></head>
+<html lang="id"><head><title>Login • <?=e((store_info()['name'] ?? APP_NAME))?></title><?php include __DIR__.'/components/head.php'; ?></head>
 <body class="min-h-screen bg-slate-100">
 <div class="flex min-h-screen items-center justify-center p-4 sm:p-6">
 <div class="grid w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-slate-300/50 lg:grid-cols-2">
