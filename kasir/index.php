@@ -287,28 +287,7 @@ async function hapusParkir(id){
  document.getElementById('btnLihatParkir').click();
 }
 
-// Intercept link logout kasir
-document.querySelectorAll('a[href*="logout.php"]').forEach(function(link) {
- link.addEventListener('click', function(e) {
-  e.preventDefault();
-  var href = this.getAttribute('href');
-  Swal.fire({
-   icon: 'warning',
-   title: 'Konfirmasi Logout',
-   text: 'Apakah Anda yakin ingin keluar dari sistem kasir?',
-   showCancelButton: true,
-   confirmButtonText: 'Ya, Keluar',
-   cancelButtonText: 'Batal',
-   buttonsStyling: false,
-   customClass: {
-    confirmButton: 'swal-btn-confirm',
-    cancelButton: 'swal-btn-cancel'
-   }
-  }).then(function(result) {
-   if (result.isConfirmed) window.location.href = href;
-  });
- });
-});
+
 document.addEventListener('keydown',e=>{
  if(e.key==='F1'){ e.preventDefault(); window.location.href='<?=url('/kasir/index')?>'; }
  if(e.key==='F2'){ e.preventDefault(); document.getElementById('searchInput').focus(); }
@@ -320,4 +299,4 @@ document.addEventListener('keydown',e=>{
 });
 renderCart();
 </script>
-</body></html>
+<?php include __DIR__.'/../components/footer.php';?></body></html>

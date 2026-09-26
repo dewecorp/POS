@@ -137,27 +137,36 @@
             });
         });
 
-        // Intercept link logout
-        document.querySelectorAll('a[href*="logout"], a[href*="Logout"]').forEach(function(link) {
-            if (link.dataset.swalLogoutBound) return;
-            link.dataset.swalLogoutBound = '1';
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var href = this.getAttribute('href');
-                window.posAlert.fire({
-                    icon: 'warning',
-                    title: 'Konfirmasi Logout',
-                    text: 'Apakah Anda yakin ingin keluar dari sistem?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Keluar',
-                    cancelButtonText: 'Batal'
-                }).then(function(result) {
-                    if (result.isConfirmed) {
-                        window.location.href = href;
-                    }
-                });
+// Intercept global link logout dengan SweetAlert2
+document.addEventListener('click', function(e) {
+    var link = e.target.closest('a[href*="logout"], a[href*="Logout"]');
+    if (link) {
+        e.preventDefault();
+        e.stopPropagation();
+        var href = link.getAttribute('href');
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin keluar dari sistem?',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'swal-btn-confirm swal-btn-danger',
+                    cancelButton: 'swal-btn-cancel'
+                }
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    window.location.href = href;
+                }
             });
-        });
+        } else {
+            window.location.href = href;
+        }
+    }
+}, true);
     }
 
     if (document.readyState === 'loading') {
