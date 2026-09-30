@@ -75,7 +75,7 @@ if($printView): ?>
 }
 </style>
 </head><body class="bg-slate-50 p-6 text-slate-800 font-sans">
-<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+<div class="max-w-4xl mx-auto bg-white p-8 shadow-sm border border-slate-200">
   <div class="flex justify-between items-start border-b pb-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold uppercase tracking-wider text-slate-900"><?=e($store['name'])?></h1>
@@ -90,20 +90,20 @@ if($printView): ?>
   </div>
 
   <div class="no-print mb-6 flex gap-2">
-    <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition">Print / Simpan PDF</button>
-    <a href="index.php?from=<?=$from?>&to=<?=$to?>" class="px-4 py-2 border rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Kembali</a>
+    <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition">Print / Simpan PDF</button>
+    <a href="index.php?from=<?=$from?>&to=<?=$to?>" class="px-4 py-2 border text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Kembali</a>
   </div>
 
   <div class="grid grid-cols-3 gap-3 mb-6 text-xs">
-    <div class="border rounded-lg p-3 bg-slate-50">
+    <div class="border p-3 bg-slate-50">
       <span class="text-slate-500">Total Transaksi</span>
       <div class="text-lg font-bold text-slate-900"><?=$sum['cnt']?></div>
     </div>
-    <div class="border rounded-lg p-3 bg-slate-50">
+    <div class="border p-3 bg-slate-50">
       <span class="text-slate-500">Penjualan Bersih</span>
       <div class="text-lg font-bold text-emerald-700"><?=rupiah($bersih)?></div>
     </div>
-    <div class="border rounded-lg p-3 bg-slate-50">
+    <div class="border p-3 bg-slate-50">
       <span class="text-slate-500">Laba Kotor</span>
       <div class="text-lg font-bold text-emerald-700"><?=rupiah($laba)?></div>
     </div>
